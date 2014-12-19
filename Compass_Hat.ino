@@ -1,3 +1,8 @@
+//Code for the compass hat art project
+//
+// 12/18/2014 Code provides non-tilt compensated heading and lights a single neopixel various colors based on heading
+// starting prep to include code ideas from http://blog.solutions-cubed.com/lsm303-compass-tilt-compensation/
+//
 #include <Wire.h>
 #include <LSM303.h>
 #include <FastLED.h>
@@ -9,6 +14,28 @@
 
 LSM303 compass;
 CRGB leds[NUM_LEDS];
+
+// setup variables as file scope
+float Heading;
+float Pitch;
+float Roll;
+
+float Accx;
+float Accy;
+float Accz;
+
+float Magx;
+float Magy;
+float Magz;
+
+// these values need to be replaced with sensor specific values, look at calibration example with the LSM303 library
+float Mag_minx = -32767;
+float Mag_miny = -32767;
+float Mag_minz = -32767;
+float Mag_maxx = +32767;
+float Mag_maxy = +32767;
+float Mag_maxz = +32767;
+
 
 void setup(void) {
   // sanity check delay - allows reprogramming if accidentally blowing power w/leds
@@ -23,9 +50,10 @@ void setup(void) {
    	program to determine appropriate values for your particular unit.
    	*/
   compass.m_min = (LSM303::vector<int16_t>){
-    -32767, -32767, -32767      };
+    Mag_minx, Mag_miny, Mag_minz };
   compass.m_max = (LSM303::vector<int16_t>){
-    +32767, +32767, +32767      };
+    Mag_maxx, Mag_maxy, Mag_maxz };
+	
   // setup neopixels
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   fill_solid ( &(leds[0]), NUM_LEDS, CRGB::Black);
